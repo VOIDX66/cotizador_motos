@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cotizador de motos</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 :root {
@@ -51,6 +52,17 @@ body { font-family: 'DM Sans', sans-serif; background: var(--negro); margin: 0; 
 /* PREVIEW */
 .preview-box { display: none; margin-top: 24px; background: #161616; border: 1px solid #2a2a2a; border-radius: 10px; padding: 20px; align-items: center; justify-content: center; min-height: 160px; }
 
+/* MARKDOWN en info extra */
+#modal-extra p { margin: 0 0 6px; }
+#modal-extra p:last-child { margin-bottom: 0; }
+#modal-extra ul, #modal-extra ol { margin: 4px 0 6px 18px; padding: 0; }
+#modal-extra li { margin-bottom: 2px; }
+#modal-extra strong { color: #333; }
+#modal-extra h1, #modal-extra h2, #modal-extra h3 { font-family: 'Bebas Neue', sans-serif; color: #111; margin: 8px 0 4px; letter-spacing: 1px; }
+#modal-extra h1 { font-size: 22px; }
+#modal-extra h2 { font-size: 18px; }
+#modal-extra h3 { font-size: 15px; }
+
 /* CHECKBOXES PRECIO */
 .precio-checks { display: flex; gap: 24px; padding: 4px 0; flex-wrap: wrap; }
 .precio-checks span { display: flex; align-items: center; gap: 8px; cursor: pointer; }
@@ -59,10 +71,48 @@ body { font-family: 'DM Sans', sans-serif; background: var(--negro); margin: 0; 
 
 /* PRINT */
 @media print {
+  @page { size: letter portrait; margin: 0; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
   body > *:not(#modal-overlay) { display: none !important; }
   #modal-overlay { display: block !important; position: static !important; background: white !important; padding: 0 !important; overflow: visible !important; }
   #modal-acciones { display: none !important; }
-  #modal-cotizacion { box-shadow: none !important; border-radius: 0 !important; max-width: 100% !important; }
+  #modal-cotizacion {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    height: 279mm !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  /* Header: compacto, logo grande */
+  #modal-header-print { padding: 6mm 12mm 5mm !important; }
+  #modal-header-print img { height: 18mm !important; }
+  #modal-header-print .cotiz-label { font-size: 13pt !important; }
+  #modal-header-print .cotiz-fecha { font-size: 9pt !important; }
+  /* Sección moto: crece para llenar la hoja */
+  #modal-moto-section { flex: 1 !important; padding: 5mm 12mm 4mm !important; }
+  /* Etiqueta vehículo */
+  #modal-vehiculo-label { font-size: 7pt !important; margin-bottom: 1mm !important; }
+  /* Titulo moto */
+  #modal-titulo { font-size: 32pt !important; margin-bottom: 4mm !important; }
+  /* Imagen moto: ocupa el espacio disponible */
+  #modal-img-wrap { height: 95mm !important; margin-bottom: 4mm !important; }
+  /* Precios */
+  #modal-precios > div { padding: 3mm 6mm !important; }
+  #modal-precios > div > div:first-child { font-size: 7pt !important; }
+  #modal-precios > div > div:last-child { font-size: 20pt !important; }
+  /* Info extra */
+  #modal-extra-wrap { padding: 3mm 12mm !important; }
+  #modal-extra { font-size: 9pt !important; line-height: 1.4 !important; }
+  /* Asesor */
+  #modal-accesor-section { padding: 3mm 12mm 4mm !important; }
+  #modal-accesor-label { font-size: 7pt !important; margin-bottom: 2mm !important; }
+  #modal-accesor { font-size: 14pt !important; }
+  #modal-celular { font-size: 14pt !important; }
+  /* Footer */
+  #modal-footer-print { padding: 3mm 12mm !important; }
+  #modal-footer-print div { font-size: 7pt !important; }
 }
 </style>
 </head>
@@ -100,8 +150,8 @@ body { font-family: 'DM Sans', sans-serif; background: var(--negro); margin: 0; 
       </select>
     </div>
     <div class="field">
-      <label>Accesor</label>
-      <input type="text" id="accesor" placeholder="Nombre del accesor">
+      <label>Asesor</label>
+      <input type="text" id="accesor" placeholder="Nombre del asesor">
     </div>
     <div class="field">
       <label>Celular</label>
@@ -147,61 +197,61 @@ body { font-family: 'DM Sans', sans-serif; background: var(--negro); margin: 0; 
   <div id="modal-cotizacion" style="background:#fff; color:#111; max-width:680px; margin:0 auto; border-radius:12px; overflow:hidden; font-family:'DM Sans',sans-serif; box-shadow:0 20px 60px rgba(0,0,0,0.5);">
 
     <!-- Header empresa -->
-    <div style="background:#111; padding:24px 32px; display:flex; align-items:center; justify-content:space-between;">
-      <img src="/static/empresa/ibiza.jpg" alt="Logo" style="height:56px; object-fit:contain; border-radius:8px;"
+    <div id="modal-header-print" style="background:#111; padding:16px 32px; display:flex; align-items:center; justify-content:space-between;">
+      <img src="/static/empresa/ibiza.jpg" alt="Logo" style="height:64px; object-fit:contain; border-radius:8px;"
            onerror="this.style.display='none'">
       <div style="text-align:right;">
-        <div style="font-family:'Bebas Neue',sans-serif; font-size:13px; letter-spacing:2.5px; color:#e02020; text-transform:uppercase;">Cotización</div>
-        <div id="modal-fecha" style="font-size:12px; color:#888; margin-top:3px;"></div>
+        <div class="cotiz-label" style="font-family:'Bebas Neue',sans-serif; font-size:13px; letter-spacing:2.5px; color:#e02020; text-transform:uppercase;">Cotización</div>
+        <div id="modal-fecha" class="cotiz-fecha" style="font-size:12px; color:#888; margin-top:3px;"></div>
       </div>
     </div>
 
     <!-- Moto -->
-    <div style="padding:28px 32px; border-bottom:2px solid #f0f0f0;">
-      <div style="display:flex; gap:24px; align-items:flex-start; flex-wrap:wrap;">
-        <div id="modal-img-wrap" style="width:200px; height:140px; background:#f5f5f5; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden;">
-          <img id="modal-moto-img" src="" alt="Moto" style="width:100%; height:100%; object-fit:contain;">
+    <div id="modal-moto-section" style="padding:20px 32px 22px; border-bottom:2px solid #f0f0f0;">
+      <!-- Nombre -->
+      <div style="margin-bottom:18px;">
+        <div id="modal-vehiculo-label" style="font-size:10px; font-weight:600; letter-spacing:1.8px; text-transform:uppercase; color:#bbb; margin-bottom:4px;">Vehículo</div>
+        <div id="modal-titulo" style="font-family:'Bebas Neue',sans-serif; font-size:38px; letter-spacing:1px; line-height:1; color:#111;"></div>
+      </div>
+      <!-- Imagen -->
+      <div id="modal-img-wrap" style="width:100%; height:220px; background:#f5f5f5; border-radius:8px; display:flex; align-items:center; justify-content:center; overflow:hidden; margin-bottom:16px;">
+        <img id="modal-moto-img" src="" alt="Moto" style="width:100%; height:100%; object-fit:contain;">
+      </div>
+      <!-- Precios -->
+      <div id="modal-precios" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div id="wrap-contado" style="background:#fff5f5; border-radius:8px; padding:13px 16px; border-left:3px solid #e02020;">
+          <div style="font-size:12px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#777; margin-bottom:4px;">Precio contado</div>
+          <div id="modal-contado" style="font-family:'Bebas Neue',sans-serif; font-size:26px; color:#e02020;"></div>
         </div>
-        <div style="flex:1; min-width:180px;">
-          <div style="font-size:10px; font-weight:600; letter-spacing:1.8px; text-transform:uppercase; color:#bbb; margin-bottom:6px;">Vehículo</div>
-          <div id="modal-titulo" style="font-family:'Bebas Neue',sans-serif; font-size:34px; letter-spacing:1px; line-height:1; color:#111; margin-bottom:20px;"></div>
-          <div id="modal-precios" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-            <div id="wrap-contado" style="background:#fff5f5; border-radius:8px; padding:13px 16px; border-left:3px solid #e02020;">
-              <div style="font-size:10px; font-weight:600; letter-spacing:1.2px; text-transform:uppercase; color:#bbb; margin-bottom:4px;">Precio contado</div>
-              <div id="modal-contado" style="font-family:'Bebas Neue',sans-serif; font-size:24px; color:#e02020;"></div>
-            </div>
-            <div id="wrap-credito" style="background:#f9f9f9; border-radius:8px; padding:13px 16px; border-left:3px solid #ddd;">
-              <div style="font-size:10px; font-weight:600; letter-spacing:1.2px; text-transform:uppercase; color:#bbb; margin-bottom:4px;">Precio crédito</div>
-              <div id="modal-credito" style="font-family:'Bebas Neue',sans-serif; font-size:24px; color:#444;"></div>
-            </div>
-          </div>
+        <div id="wrap-credito" style="background:#f9f9f9; border-radius:8px; padding:13px 16px; border-left:3px solid #ddd;">
+          <div style="font-size:12px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#777; margin-bottom:4px;">Precio crédito</div>
+          <div id="modal-credito" style="font-family:'Bebas Neue',sans-serif; font-size:26px; color:#444;"></div>
         </div>
+      </div>
+      <!-- Info extra -->
+      <div id="modal-extra-wrap" style="display:none; margin-top:14px; padding:12px 16px; border-radius:8px; background:#fafafa; border:1px solid #eee;">
+        <div style="font-size:12px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#777; margin-bottom:6px;">Información adicional</div>
+        <div id="modal-extra" style="font-size:14px; color:#555; line-height:1.6;"></div>
       </div>
     </div>
 
-    <!-- Info extra -->
-    <div id="modal-extra-wrap" style="display:none; padding:18px 32px; border-bottom:1px solid #f0f0f0; background:#fafafa;">
-      <div style="font-size:10px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:#bbb; margin-bottom:6px;">Información adicional</div>
-      <div id="modal-extra" style="font-size:14px; color:#555; line-height:1.7;"></div>
-    </div>
-
-    <!-- Accesor -->
-    <div style="padding:20px 32px 24px; background:#fff;">
-      <div style="font-size:10px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:#bbb; margin-bottom:12px;">Datos del accesor</div>
-      <div style="display:flex; gap:40px; flex-wrap:wrap;">
+    <!-- Asesor -->
+    <div id="modal-accesor-section" style="padding:16px 32px 18px; background:#fff; border-top:2px solid #f0f0f0;">
+      <div id="modal-accesor-label" style="font-size:12px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#777; margin-bottom:10px;">Datos del asesor</div>
+      <div style="display:flex; gap:48px; flex-wrap:wrap;">
         <div>
-          <div style="font-size:11px; color:#bbb; margin-bottom:3px;">Nombre</div>
-          <div id="modal-accesor" style="font-size:16px; font-weight:600; color:#111;"></div>
+          <div style="font-size:12px; color:#bbb; margin-bottom:3px;">Nombre</div>
+          <div id="modal-accesor" style="font-size:20px; font-weight:600; color:#111;"></div>
         </div>
         <div>
-          <div style="font-size:11px; color:#bbb; margin-bottom:3px;">Celular</div>
-          <div id="modal-celular" style="font-size:16px; font-weight:600; color:#111;"></div>
+          <div style="font-size:12px; color:#bbb; margin-bottom:3px;">Celular</div>
+          <div id="modal-celular" style="font-size:20px; font-weight:600; color:#111;"></div>
         </div>
       </div>
     </div>
 
     <!-- Footer -->
-    <div style="background:#111; padding:12px 32px; text-align:center;">
+    <div id="modal-footer-print" style="background:#111; padding:10px 32px; text-align:center; margin-top:auto;">
       <div style="font-size:11px; color:#555; letter-spacing:1px; text-transform:uppercase;">Ibiza Motos &middot; Cotización generada el <span id="modal-fecha-footer"></span></div>
     </div>
 
@@ -290,7 +340,7 @@ document.getElementById("btn-cotizar").addEventListener("click", function() {
   var chkCredito = document.getElementById("chk-credito").checked;
 
   if (!marca || !modelo)          { alert("Por favor seleccione una marca y un modelo."); return; }
-  if (!accesor || !celular)       { alert("Por favor complete los campos de Accesor y Celular."); return; }
+  if (!accesor || !celular)       { alert("Por favor complete los campos de Asesor y Celular."); return; }
   if (!chkContado && !chkCredito) { alert("Seleccione al menos un tipo de precio para mostrar."); return; }
 
   var moto = null;
@@ -331,7 +381,7 @@ document.getElementById("btn-cotizar").addEventListener("click", function() {
   var extraWrap = document.getElementById("modal-extra-wrap");
   if (extra) {
     extraWrap.style.display = "block";
-    document.getElementById("modal-extra").textContent = extra;
+    document.getElementById("modal-extra").innerHTML = marked.parse(extra);
   } else {
     extraWrap.style.display = "none";
   }
