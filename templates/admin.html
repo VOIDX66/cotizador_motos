@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administración catálogo</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --rojo: #e02020;
+  --negro: #111111;
+  --gris-oscuro: #1e1e1e;
+  --gris-medio: #2e2e2e;
+  --gris-claro: #f0f0f0;
+  --blanco: #ffffff;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--negro);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  color: var(--blanco);
+}
+
+/* BANNER */
+.banner-wrap {
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+  position: relative;
+}
+
+.banner-wrap::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: linear-gradient(to bottom, transparent, var(--negro));
+}
+
+.banner-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.banner-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2e2e2e 50%, #1a1a1a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.banner-placeholder span {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 48px;
+  color: var(--rojo);
+  letter-spacing: 4px;
+  opacity: 0.6;
+}
+
+/* LAYOUT */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px 60px;
+}
+
+/* HEADER */
+.header {
+  padding: 32px 0 20px;
+  border-bottom: 1px solid #2a2a2a;
+  margin-bottom: 28px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.header h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 52px;
+  margin: 0;
+  letter-spacing: 2px;
+  line-height: 1;
+  color: var(--blanco);
+}
+
+.header h1 span {
+  color: var(--rojo);
+}
+
+.cotizar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  color: #888;
+  padding: 8px 16px;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 13px;
+  border: 1px solid #333;
+  transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.cotizar-btn:hover {
+  border-color: #666;
+  color: var(--blanco);
+}
+
+/* FILTRO */
+.filtro {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.filtro label,
+.filtro span {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #666;
+}
+
+.filtro select {
+  background: var(--gris-oscuro);
+  border: 1px solid #333;
+  border-radius: 6px;
+  color: var(--blanco);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  padding: 8px 36px 8px 12px;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.filtro select:focus {
+  border-color: var(--rojo);
+}
+
+.filtro select option {
+  background: #1e1e1e;
+}
+
+.btn-ordenar {
+  background: var(--gris-oscuro);
+  border: 1px solid #333;
+  color: var(--blanco);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.btn-ordenar:hover {
+  border-color: #555;
+  background: #2a2a2a;
+}
+
+/* TABLA */
+.tabla-wrap {
+  overflow-x: auto;
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
+}
+
+thead tr {
+  background: var(--gris-oscuro);
+  border-bottom: 1px solid #2a2a2a;
+}
+
+thead th {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #666;
+  padding: 14px 12px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+tbody tr {
+  border-bottom: 1px solid #1e1e1e;
+  transition: background 0.15s;
+}
+
+tbody tr:last-child {
+  border-bottom: none;
+}
+
+tbody tr:hover {
+  background: #181818;
+}
+
+tbody td {
+  padding: 12px;
+  text-align: center;
+  font-size: 14px;
+  color: #ccc;
+  vertical-align: middle;
+}
+
+.td-marca {
+  font-weight: 600;
+  color: var(--blanco);
+  white-space: nowrap;
+}
+
+.td-modelo {
+  color: #aaa;
+  white-space: nowrap;
+}
+
+.td-fecha {
+  font-size: 12px;
+  color: #555;
+  white-space: nowrap;
+  font-family: monospace;
+}
+
+/* INPUTS EN TABLA */
+.input-precio {
+  background: #161616;
+  border: 1px solid #2e2e2e;
+  border-radius: 5px;
+  color: var(--blanco);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  padding: 7px 10px;
+  text-align: center;
+  width: 130px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input-precio:focus {
+  border-color: var(--rojo);
+}
+
+/* BOTONES */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: opacity 0.2s, transform 0.1s;
+  white-space: nowrap;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn:hover {
+  opacity: 0.85;
+}
+
+.btn-guardar {
+  background: var(--rojo);
+  color: white;
+}
+
+.btn-eliminar {
+  background: #2e2e2e;
+  color: #e55;
+  border: 1px solid #3a2020;
+}
+
+.btn-eliminar:hover {
+  background: #3a1a1a;
+  opacity: 1;
+}
+
+.btn-subir {
+  background: #2a2a2a;
+  color: #aaa;
+  border: 1px solid #333;
+}
+
+.btn-subir:hover {
+  border-color: #555;
+  color: var(--blanco);
+  opacity: 1;
+}
+
+/* CELDA IMAGEN */
+.imagen-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+img.preview {
+  width: 110px;
+  height: 72px;
+  object-fit: contain;
+  border-radius: 5px;
+  border: 1px solid #2a2a2a;
+  background: #161616;
+}
+
+.sin-imagen {
+  display: none;
+  font-size: 11px;
+  color: #e55;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.sin-imagen .ruta-img {
+  font-family: monospace;
+  font-size: 10px;
+  color: #555;
+  background: #1a1a1a;
+  padding: 3px 6px;
+  border-radius: 3px;
+  border: 1px solid #2e2e2e;
+  display: inline-block;
+  margin-top: 4px;
+  word-break: break-all;
+  max-width: 160px;
+}
+
+.upload-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.input-file {
+  font-size: 11px;
+  color: #666;
+  width: 100%;
+  max-width: 160px;
+}
+
+.input-file::file-selector-button {
+  background: #2a2a2a;
+  border: 1px solid #333;
+  color: #aaa;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 11px;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* SECCIÓN AGREGAR */
+.section-agregar {
+  margin-top: 48px;
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.section-agregar-header {
+  background: var(--gris-oscuro);
+  padding: 18px 28px;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.section-agregar-header h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  margin: 0;
+  letter-spacing: 1px;
+  color: var(--blanco);
+}
+
+.form-agregar {
+  padding: 28px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  align-items: end;
+}
+
+@media (max-width: 800px) {
+  .form-agregar {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 500px) {
+  .form-agregar {
+    grid-template-columns: 1fr;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #666;
+}
+
+.field input {
+  background: var(--gris-oscuro);
+  border: 1px solid #333;
+  border-radius: 6px;
+  color: var(--blanco);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  padding: 11px 14px;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.field input:focus {
+  border-color: var(--rojo);
+  box-shadow: 0 0 0 3px rgba(224, 32, 32, 0.12);
+}
+
+.btn-agregar {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background: var(--rojo);
+  color: var(--blanco);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  letter-spacing: 2px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  margin-top: 2px;
+}
+
+.btn-agregar:hover {
+  background: #c01818;
+}
+
+.btn-agregar:active {
+  transform: scale(0.99);
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="banner-wrap">
+  <img src="/static/empresa/ibiza.jpg" alt="Ibiza Motos"
+       onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+  <div class="banner-placeholder" style="display:none;">
+    <span>IBIZA MOTOS</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="header">
+    <h1>Administración <span>catálogo</span></h1>
+    <a href="/" class="cotizar-btn">← Volver al cotizador</a>
+  </div>
+
+  <!-- MENSAJES FLASH -->
+  {% with msgs = get_flashed_messages(with_categories=true) %}
+  {% if msgs %}
+  <div style="margin-bottom:20px; display:flex; flex-direction:column; gap:8px;">
+    {% for cat, msg in msgs %}
+    <div style="
+      padding: 12px 18px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      {% if cat == 'error' %}
+        background: rgba(224,32,32,0.1);
+        border: 1px solid rgba(224,32,32,0.3);
+        color: #ff6b6b;
+      {% else %}
+        background: rgba(40,180,100,0.08);
+        border: 1px solid rgba(40,180,100,0.25);
+        color: #5dba84;
+      {% endif %}
+    ">
+      {% if cat == 'error' %}✕{% else %}✓{% endif %} {{ msg }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% endwith %}
+
+  <!-- FILTRO -->
+  <form method="GET" action="/admin" class="filtro">
+    <span>Ordenar por fecha modificación:</span>
+    <select name="orden">
+      <option value="desc" {% if orden == 'desc' %}selected{% endif %}>Más nuevas primero</option>
+      <option value="asc"  {% if orden == 'asc'  %}selected{% endif %}>Más antiguas primero</option>
+    </select>
+    <button type="submit" class="btn-ordenar">Ordenar</button>
+  </form>
+
+  <!-- TABLA -->
+  <div class="tabla-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Marca</th>
+          <th>Modelo</th>
+          <th>Contado</th>
+          <th>Crédito</th>
+          <th>Fecha creación</th>
+          <th>Fecha modificación</th>
+          <th>Guardar</th>
+          <th>Eliminar</th>
+          <th>Imagen</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        {% for moto in motos %}
+        {% set idx = moto._idx %}
+        <tr>
+
+          <td class="td-marca">{{moto.marca}}</td>
+          <td class="td-modelo">{{moto.modelo}}</td>
+
+          <td>
+            <input class="input-precio" id="contado-{{idx}}" value="{{moto.precio_contado}}">
+          </td>
+
+          <td>
+            <input class="input-precio" id="credito-{{idx}}" value="{{moto.precio_credito}}">
+          </td>
+
+          <td class="td-fecha">{{moto.fecha_creacion}}</td>
+          <td class="td-fecha">{{moto.fecha_modificacion}}</td>
+
+          <td>
+            <button class="btn btn-guardar" onclick="guardar({{idx}})">✓ Guardar</button>
+          </td>
+
+          <td>
+            <button class="btn btn-eliminar" onclick="eliminar({{idx}})">✕ Eliminar</button>
+          </td>
+
+          <td>
+            {% set marca_file  = moto.marca.lower().replace(' ', '_') %}
+            {% set modelo_file = moto.modelo.lower().replace(' ', '_') %}
+            {% set nombre      = marca_file + '_' + modelo_file + '.jpg' %}
+
+            <div class="imagen-cell">
+              <img class="preview"
+                   src="/static/motos/{{nombre}}"
+                   onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+              <div class="sin-imagen">
+                Sin imagen
+                <div class="ruta-img">/static/motos/{{nombre}}</div>
+              </div>
+              <div class="upload-row">
+                <input class="input-file" id="file-{{idx}}" type="file" accept="image/*">
+                <button class="btn btn-subir" onclick="subirImagen({{idx}})">↑ Subir imagen</button>
+              </div>
+            </div>
+          </td>
+
+        </tr>
+        {% endfor %}
+
+      </tbody>
+    </table>
+  </div>
+
+  <!-- AGREGAR MOTO -->
+  <div class="section-agregar">
+    <div class="section-agregar-header">
+      <h2>Agregar nueva moto</h2>
+    </div>
+    <form method="POST"
+          action="/admin/agregar"
+          onsubmit="return validarAgregar(this) && confirm('¿Agregar esta moto?')"
+          class="form-agregar">
+
+      <div class="field">
+        <label>Marca</label>
+        <input name="marca" placeholder="Ej: Honda" required>
+      </div>
+
+      <div class="field">
+        <label>Modelo</label>
+        <input name="modelo" placeholder="Ej: CB190R" required>
+      </div>
+
+      <div class="field">
+        <label>Precio contado</label>
+        <input name="precio_contado" placeholder="Ej: $8.500.000" required>
+      </div>
+
+      <div class="field">
+        <label>Precio crédito</label>
+        <input name="precio_credito" placeholder="Ej: $9.200.000" required>
+      </div>
+
+      <div class="field" style="grid-column: 1 / -1;">
+        <button class="btn-agregar" type="submit">+ AGREGAR MOTO</button>
+      </div>
+
+    </form>
+  </div>
+
+</div>
+
+<script>
+
+function limpiar(val) {
+  return val.trim().replace(/[\s$.,]/g, "")
+}
+
+function esNumeroPositivo(val) {
+  const n = Number(limpiar(val))
+  return !isNaN(n) && n > 0
+}
+
+function guardar(i) {
+  const contado = document.getElementById("contado-" + i)
+  const credito = document.getElementById("credito-" + i)
+
+  if (!esNumeroPositivo(contado.value)) {
+    contado.style.borderColor = "#e02020"
+    contado.focus()
+    alert("El precio contado debe ser un número positivo.")
+    return
+  }
+  if (!esNumeroPositivo(credito.value)) {
+    credito.style.borderColor = "#e02020"
+    credito.focus()
+    alert("El precio crédito debe ser un número positivo.")
+    return
+  }
+  contado.style.borderColor = ""
+  credito.style.borderColor = ""
+
+  if (!confirm("¿Guardar cambios?")) return
+
+  const form = document.createElement("form")
+  form.method = "POST"
+  form.action = "/admin/editar/" + i
+
+  const f1 = document.createElement("input")
+  f1.type = "hidden"
+  f1.name = "precio_contado"
+  f1.value = contado.value.trim()
+
+  const f2 = document.createElement("input")
+  f2.type = "hidden"
+  f2.name = "precio_credito"
+  f2.value = credito.value.trim()
+
+  form.appendChild(f1)
+  form.appendChild(f2)
+  document.body.appendChild(form)
+  form.submit()
+}
+
+function eliminar(i) {
+  if (!confirm("¿Eliminar esta moto?")) return
+  window.location = "/admin/eliminar/" + i
+}
+
+function subirImagen(i) {
+  const fileInput = document.getElementById("file-" + i)
+  if (!fileInput.files.length) {
+    alert("Selecciona una imagen primero.")
+    return
+  }
+
+  const form = document.createElement("form")
+  form.method = "POST"
+  form.action = "/admin/subir_imagen/" + i
+  form.enctype = "multipart/form-data"
+
+  // Mover el input de archivo al form temporal
+  const clone = fileInput.cloneNode(true)
+  clone.name = "imagen"
+  form.appendChild(clone)
+  document.body.appendChild(form)
+  form.submit()
+}
+
+function validarAgregar(form) {
+  const contado = form.querySelector('[name="precio_contado"]')
+  const credito = form.querySelector('[name="precio_credito"]')
+
+  if (!esNumeroPositivo(contado.value)) {
+    contado.style.borderColor = "#e02020"
+    contado.focus()
+    alert("El precio contado debe ser un número positivo.")
+    return false
+  }
+  if (!esNumeroPositivo(credito.value)) {
+    credito.style.borderColor = "#e02020"
+    credito.focus()
+    alert("El precio crédito debe ser un número positivo.")
+    return false
+  }
+  contado.style.borderColor = ""
+  credito.style.borderColor = ""
+  return true
+}
+
+</script>
+</body>
+</html>

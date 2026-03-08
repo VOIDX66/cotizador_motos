@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cotizador de motos</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --rojo: #e02020;
+  --negro: #111111;
+  --gris-oscuro: #1e1e1e;
+  --gris-medio: #2e2e2e;
+  --gris-claro: #f0f0f0;
+  --blanco: #ffffff;
+  --acento: #ff4500;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--negro);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  color: var(--blanco);
+}
+
+/* BANNER */
+.banner-wrap {
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+  position: relative;
+}
+
+.banner-wrap::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: linear-gradient(to bottom, transparent, var(--negro));
+}
+
+.banner-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.banner-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2e2e2e 50%, #1a1a1a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.banner-placeholder span {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 48px;
+  color: var(--rojo);
+  letter-spacing: 4px;
+  opacity: 0.6;
+}
+
+/* LAYOUT */
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 24px 60px;
+}
+
+/* ENCABEZADO */
+.header {
+  padding: 32px 0 20px;
+  border-bottom: 1px solid #2a2a2a;
+  margin-bottom: 36px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.header h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 52px;
+  margin: 0;
+  letter-spacing: 2px;
+  line-height: 1;
+  color: var(--blanco);
+}
+
+.header h1 span {
+  color: var(--rojo);
+}
+
+.admin-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  color: #888;
+  padding: 8px 16px;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 13px;
+  border: 1px solid #333;
+  transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.admin-btn:hover {
+  border-color: #666;
+  color: var(--blanco);
+}
+
+/* FORMULARIO */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 600px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .header h1 { font-size: 38px; }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field.full-width {
+  grid-column: 1 / -1;
+}
+
+.field label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #888;
+}
+
+.field select,
+.field input,
+.field textarea {
+  background: var(--gris-oscuro);
+  border: 1px solid #333;
+  border-radius: 6px;
+  color: var(--blanco);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  padding: 12px 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.field select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 38px;
+  cursor: pointer;
+}
+
+.field select option {
+  background: #1e1e1e;
+  color: #fff;
+}
+
+.field textarea {
+  resize: vertical;
+  min-height: 70px;
+}
+
+.field select:focus,
+.field input:focus,
+.field textarea:focus {
+  border-color: var(--rojo);
+  box-shadow: 0 0 0 3px rgba(224, 32, 32, 0.12);
+}
+
+.field select:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* COTIZAR BUTTON */
+.btn-cotizar {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 15px;
+  background: var(--rojo);
+  color: var(--blanco);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 2px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btn-cotizar:hover {
+  background: #c01818;
+}
+
+.btn-cotizar:active {
+  transform: scale(0.99);
+}
+
+/* RESULTADO */
+.resultado {
+  margin-top: 40px;
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+  overflow: hidden;
+  animation: fadeUp 0.4s ease;
+  display: none;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.resultado-header {
+  background: var(--gris-oscuro);
+  padding: 20px 28px;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.resultado-header h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 36px;
+  letter-spacing: 1px;
+  margin: 0;
+  color: var(--blanco);
+}
+
+.resultado-header .tag {
+  display: inline-block;
+  background: var(--rojo);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 3px;
+  margin-bottom: 8px;
+}
+
+.resultado-body {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 0;
+}
+
+@media (max-width: 600px) {
+  .resultado-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* IMAGEN */
+.img-wrap {
+  background: #161616;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  border-right: 1px solid #2a2a2a;
+  min-height: 180px;
+}
+
+.img-wrap img {
+  width: 100%;
+  max-width: 220px;
+  height: 160px;
+  object-fit: contain;
+  border-radius: 4px;
+  display: none;
+}
+
+.img-error {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.img-error .icon {
+  font-size: 36px;
+  opacity: 0.4;
+}
+
+.img-error .msg {
+  font-size: 12px;
+  color: #e55;
+  font-weight: 600;
+}
+
+.img-error .ruta {
+  font-size: 11px;
+  color: #666;
+  word-break: break-all;
+  max-width: 200px;
+  font-family: monospace;
+  background: #1e1e1e;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #333;
+}
+
+/* INFO */
+.info-wrap {
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.info-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.info-row .lbl {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #666;
+}
+
+.info-row .val {
+  font-size: 15px;
+  color: var(--blanco);
+}
+
+.precios-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.precio-box {
+  background: var(--gris-oscuro);
+  border-radius: 8px;
+  padding: 14px 16px;
+  border: 1px solid #2a2a2a;
+}
+
+.precio-box .lbl {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.precio-box .val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  color: var(--blanco);
+  letter-spacing: 0.5px;
+}
+
+.precio-box.destacado {
+  border-color: var(--rojo);
+  background: rgba(224, 32, 32, 0.06);
+}
+
+.precio-box.destacado .val {
+  color: #ff6b6b;
+}
+
+.img-ruta-ok {
+  display: none;
+  font-size: 11px;
+  color: #555;
+  font-family: monospace;
+  margin-top: 6px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="banner-wrap">
+  <img src="/static/empresa/ibiza.jpg" alt="Ibiza Motos"
+       onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+  <div class="banner-placeholder" style="display:none;">
+    <span>IBIZA MOTOS</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="header">
+    <h1>Cotizador de <span>motos</span></h1>
+    <a class="admin-btn" href="/admin">⚙ Administrar catálogo</a>
+  </div>
+
+  <div class="form-grid">
+
+    <div class="field">
+      <label>Marca</label>
+      <select id="marca">
+        <option value="">Seleccione marca</option>
+        {% for marca in marcas %}
+        <option value="{{marca}}">{{marca}}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Modelo</label>
+      <select id="modelo" disabled>
+        <option value="">Seleccione modelo</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Accesor</label>
+      <input type="text" id="accesor" placeholder="Nombre del accesor">
+    </div>
+
+    <div class="field">
+      <label>Celular</label>
+      <input type="tel" id="celular" placeholder="Número de celular">
+    </div>
+
+    <div class="field full-width">
+      <label>Info extra (opcional)</label>
+      <textarea id="info_extra" placeholder="Información adicional sobre la cotización..."></textarea>
+    </div>
+
+  </div>
+
+  <!-- PREVIEW IMAGEN (visible al seleccionar modelo) -->
+  <div id="preview-imagen" style="display:none; margin-top:24px; background:#161616; border:1px solid #2a2a2a; border-radius:10px; padding:20px; display:none; align-items:center; justify-content:center; min-height:180px;">
+    <img id="imagen-preview" src="" alt="Foto de la moto" style="max-width:260px; height:180px; object-fit:contain; border-radius:6px; display:none;">
+    <div id="img-preview-error" style="display:none; flex-direction:column; align-items:center; gap:8px; text-align:center;">
+      <div style="font-size:36px; opacity:0.4;">🏍️</div>
+      <div style="font-size:12px; color:#e55; font-weight:600;">Imagen no encontrada</div>
+      <div id="img-preview-ruta" style="font-size:11px; color:#666; word-break:break-all; max-width:300px; font-family:monospace; background:#1e1e1e; padding:4px 8px; border-radius:4px; border:1px solid #333;"></div>
+    </div>
+  </div>
+
+  <button class="btn-cotizar" onclick="cotizar()" style="margin-top:20px;">GENERAR COTIZACIÓN</button>
+
+  <!-- RESULTADO -->
+  <div class="resultado" id="resultado">
+
+    <div class="resultado-header">
+      <div class="tag">Cotización</div>
+      <h2 id="titulo"></h2>
+    </div>
+
+    <div class="resultado-body">
+
+      <!-- Imagen -->
+      <div class="img-wrap">
+        <img id="imagen" src="" alt="Foto de la moto">
+
+        <div class="img-error" id="img_error">
+          <div class="icon">🏍️</div>
+          <div class="msg">Imagen no encontrada</div>
+          <div class="ruta" id="imagen_ruta"></div>
+        </div>
+      </div>
+
+      <!-- Info -->
+      <div class="info-wrap">
+
+        <div class="info-row">
+          <span class="lbl">Accesor</span>
+          <span class="val" id="accesor_display"></span>
+        </div>
+
+        <div class="info-row">
+          <span class="lbl">Celular</span>
+          <span class="val" id="celular_display"></span>
+        </div>
+
+        <div id="info_extra_container" style="display:none;" class="info-row">
+          <span class="lbl">Info extra</span>
+          <span class="val" id="info_extra_display"></span>
+        </div>
+
+        <div class="precios-grid">
+          <div class="precio-box destacado">
+            <div class="lbl">Precio contado</div>
+            <div class="val" id="precio_contado"></div>
+          </div>
+          <div class="precio-box">
+            <div class="lbl">Precio crédito</div>
+            <div class="val" id="precio_credito"></div>
+          </div>
+        </div>
+
+        <div class="img-ruta-ok" id="imagen_ruta_ok_wrap">
+          📁 <span id="imagen_ruta_ok"></span>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+const motos = {{ motos|tojson }}
+
+const marcaSelect  = document.getElementById("marca")
+const modeloSelect = document.getElementById("modelo")
+
+// Llenar modelos al cambiar marca
+marcaSelect.addEventListener("change", function(){
+  const marca = this.value
+
+  modeloSelect.innerHTML = '<option value="">Seleccione modelo</option>'
+  modeloSelect.disabled = !marca
+
+  // Ocultar imagen al cambiar marca
+  resetImagen()
+  document.getElementById("preview-imagen").style.display = "none"
+
+  if(!marca) return
+
+  motos
+    .filter(m => m.marca === marca)
+    .forEach(moto => {
+      const opt = document.createElement("option")
+      opt.value = moto.modelo
+      opt.textContent = moto.modelo
+      modeloSelect.appendChild(opt)
+    })
+})
+
+// Mostrar imagen al seleccionar modelo
+modeloSelect.addEventListener("change", function(){
+  const modelo = this.value
+  const marca  = marcaSelect.value
+  if(!modelo || !marca) { resetImagen(); return }
+
+  const marca_file  = marca.toLowerCase().replaceAll(" ", "_")
+  const modelo_file = modelo.toLowerCase().replaceAll(" ", "_")
+  const ruta_imagen = "/static/motos/" + marca_file + "_" + modelo_file + ".jpg"
+
+  cargarImagen(ruta_imagen)
+})
+
+function resetImagen() {
+  const imgEl    = document.getElementById("imagen")
+  const imgError = document.getElementById("img_error")
+  const rutaOkWrap = document.getElementById("imagen_ruta_ok_wrap")
+  imgEl.onload = null
+  imgEl.onerror = null
+  imgEl.src = ""
+  imgEl.style.display      = "none"
+  imgError.style.display   = "none"
+  rutaOkWrap.style.display = "none"
+}
+
+function cargarImagen(ruta_imagen) {
+  // --- Preview independiente (visible siempre al seleccionar modelo) ---
+  const preview      = document.getElementById("preview-imagen")
+  const imgPrev      = document.getElementById("imagen-preview")
+  const errPrev      = document.getElementById("img-preview-error")
+  const rutaPrev     = document.getElementById("img-preview-ruta")
+
+  preview.style.display  = "flex"
+  imgPrev.style.display  = "none"
+  errPrev.style.display  = "none"
+  imgPrev.onload = null
+  imgPrev.onerror = null
+  imgPrev.src = ""
+
+  imgPrev.onload = function() {
+    imgPrev.style.display = "block"
+    errPrev.style.display = "none"
+  }
+  imgPrev.onerror = function() {
+    imgPrev.style.display = "none"
+    errPrev.style.display = "flex"
+    rutaPrev.textContent  = ruta_imagen
+  }
+  imgPrev.src = ruta_imagen
+
+  // --- Imagen dentro del resultado (se sincroniza al cotizar) ---
+  const imgEl      = document.getElementById("imagen")
+  const imgError   = document.getElementById("img_error")
+  const rutaOkWrap = document.getElementById("imagen_ruta_ok_wrap")
+
+  imgEl.onload = null
+  imgEl.onerror = null
+  imgEl.src = ""
+  imgEl.style.display      = "none"
+  imgError.style.display   = "none"
+  rutaOkWrap.style.display = "none"
+
+  imgEl.onload = function() {
+    imgEl.style.display      = "block"
+    imgError.style.display   = "none"
+    rutaOkWrap.style.display = "block"
+    document.getElementById("imagen_ruta_ok").textContent = ruta_imagen
+  }
+  imgEl.onerror = function() {
+    imgEl.style.display    = "none"
+    imgError.style.display = "flex"
+    document.getElementById("imagen_ruta").textContent = ruta_imagen
+    rutaOkWrap.style.display = "none"
+  }
+  imgEl.src = ruta_imagen
+}
+
+// Cotizar
+function cotizar() {
+  const marca   = marcaSelect.value
+  const modelo  = modeloSelect.value
+  const accesor = document.getElementById("accesor").value.trim()
+  const celular = document.getElementById("celular").value.trim()
+  const extra   = document.getElementById("info_extra").value.trim()
+
+  if(!marca || !modelo) {
+    alert("Por favor seleccione una marca y un modelo.")
+    return
+  }
+  if(!accesor || !celular) {
+    alert("Por favor complete los campos de Accesor y Celular.")
+    return
+  }
+
+  const moto = motos.find(m => m.marca === marca && m.modelo === modelo)
+  if(!moto) return
+
+  // Llenar datos
+  document.getElementById("titulo").textContent        = marca + " " + modelo
+  document.getElementById("accesor_display").textContent = accesor
+  document.getElementById("celular_display").textContent = celular
+  document.getElementById("precio_contado").textContent  = moto.precio_contado
+  document.getElementById("precio_credito").textContent  = moto.precio_credito
+
+  const extraContainer = document.getElementById("info_extra_container")
+  if(extra) {
+    extraContainer.style.display = "flex"
+    document.getElementById("info_extra_display").textContent = extra
+  } else {
+    extraContainer.style.display = "none"
+  }
+
+  // Imagen (recarga por si acaso no se había seleccionado el modelo antes)
+  const marca_file  = marca.toLowerCase().replaceAll(" ", "_")
+  const modelo_file = modelo.toLowerCase().replaceAll(" ", "_")
+  cargarImagen("/static/motos/" + marca_file + "_" + modelo_file + ".jpg")
+
+  // Mostrar resultado
+  const resultado = document.getElementById("resultado")
+  resultado.style.display = "block"
+  resultado.scrollIntoView({ behavior: "smooth", block: "start" })
+}
+
+</script>
+
+</body>
+</html>
