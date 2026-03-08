@@ -1,6 +1,8 @@
 import sys
 import os
 import json
+import webbrowser
+from threading import Timer
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, flash
 
@@ -31,6 +33,9 @@ app.secret_key = "ibiza_motos_secret"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # --- HELPER FUNCTIONS ---
+
+def open_browser():
+    webbrowser.open_new("http://127.0.0.1:5000")
 
 def cargar_motos():
     if not os.path.exists(DATA_FILE):
@@ -178,4 +183,5 @@ def subir_imagen(i):
 
 if __name__ == "__main__":
     # debug=False prevents the "reloader" from opening the app twice in a bundle
+    Timer(1.5, open_browser).start()
     app.run(host="127.0.0.1", port=5000, debug=False)
