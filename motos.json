@@ -6,5 +6,21 @@
         "precio_credito": "22222223",
         "fecha_creacion": "2026-03-08 00:40",
         "fecha_modificacion": "2026-03-08 00:40"
+    },
+    {
+        "marca": "HONDA",
+        "modelo": "XR 190L 2.0",
+        "precio_contado": "14646000",
+        "precio_credito": "14822500",
+        "fecha_creacion": "2026-03-08 11:41",
+        "fecha_modificacion": "2026-03-08 11:41"
+    },
+    {
+        "marca": "Honda",
+        "modelo": "CB190R",
+        "precio_contado": "11111111",
+        "precio_credito": "22222223",
+        "fecha_creacion": "2026-03-08 11:46",
+        "fecha_modificacion": "2026-03-08 11:46"
     }
 ]
