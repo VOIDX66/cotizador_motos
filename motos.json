@@ -1,1 +1,10 @@
-[]
+[
+    {
+        "marca": "Akt",
+        "modelo": "Nkd 125",
+        "precio_contado": "11111111",
+        "precio_credito": "22222223",
+        "fecha_creacion": "2026-03-08 00:40",
+        "fecha_modificacion": "2026-03-08 00:40"
+    }
+]
